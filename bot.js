@@ -1,26 +1,28 @@
 const fs = require("fs");
-const { Client, GatewayIntentBits, Collection, Partials } = require("discord.js");
+const { Client, Intents, Collection } = require("discord.js");
+
+// Client oluştur
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.DirectMessages
+        Intents.Flags.GUILDS,
+        Intents.Flags.GUILD_MESSAGES,
+        Intents.Flags.GUILD_MEMBERS,
+        Intents.Flags.DIRECT_MESSAGES,
+        Intents.Flags.GUILD_MESSAGE_REACTIONS,
+        Intents.Flags.GUILD_MESSAGE_TYPING,
+        Intents.Flags.GUILD_PRESENCES
     ],
-    partials: [
-        Partials.Channel,
-        Partials.Message,
-        Partials.User,
-        Partials.GuildMember
-    ]
+    partials: ['CHANNEL', 'MESSAGE', 'USER', 'GUILD_MEMBER', 'REACTION']
 });
+
+// Dotenv yapılandırması
 require('dotenv').config();
 
 // Prefix tanımı
 const PREFIX = process.env.PREFIX || 's!';
 client.prefix = PREFIX;
 
+// Koleksiyonları oluştur
 client.commands = new Collection();
 client.aliases = new Collection();
 
@@ -60,9 +62,21 @@ for (const file of eventFiles) {
     }
 }
 
-// Error handling
+// Hata yönetimi
 process.on('unhandledRejection', error => {
-    console.error('Unhandled promise rejection:', error);
+    console.error('İşlenmeyen hata:', error);
 });
 
-client.login(process.env.TOKEN);
+// Bağlantı hatası yönetimi
+client.on('disconnect', () => {
+    console.log('Bot bağlantısı kesildi, yeniden bağlanmaya çalışılıyor...');
+});
+
+client.on('error', error => {
+    console.error('Bir hata oluştu:', error);
+});
+
+// Bota giriş yap
+client.login(process.env.TOKEN).catch(error => {
+    console.error('Giriş yapılırken hata oluştu:', error);
+});

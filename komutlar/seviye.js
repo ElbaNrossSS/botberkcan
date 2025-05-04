@@ -1,4 +1,4 @@
-const { AttachmentBuilder } = require('discord.js');
+const { MessageAttachment } = require('discord.js');
 const Canvas = require('canvas');
 const db = require('../util/database');
 
@@ -91,7 +91,7 @@ module.exports = {
             ctx.clip();
 
             // Avatar yükle ve çiz
-            const avatar = await Canvas.loadImage(target.displayAvatarURL({ extension: 'png', size: 256 }));
+            const avatar = await Canvas.loadImage(target.displayAvatarURL({ format: 'png', size: 256 }));
             ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
             ctx.restore();
 
@@ -152,7 +152,7 @@ module.exports = {
             ctx.fillText(`${progress.toFixed(1)}%`, barX + barWidth - 10, barY + barHeight + 25);
 
             // Resmi gönder
-            const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'rank.png' });
+            const attachment = new MessageAttachment(canvas.toBuffer(), 'rank.png');
             await message.channel.send({ files: [attachment] });
 
         } catch (error) {
