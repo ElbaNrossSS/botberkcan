@@ -1,17 +1,24 @@
 const fs = require("fs");
-const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const { Client, GatewayIntentBits, Collection, Partials } = require("discord.js");
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.DirectMessages
+    ],
+    partials: [
+        Partials.Channel,
+        Partials.Message,
+        Partials.User,
+        Partials.GuildMember
     ]
 });
 require('dotenv').config();
 
 // Prefix tanımı
-const PREFIX = 's!';
+const PREFIX = process.env.PREFIX || 's!';
 client.prefix = PREFIX;
 
 client.commands = new Collection();
@@ -53,4 +60,9 @@ for (const file of eventFiles) {
     }
 }
 
-client.login("OTk5MDQ5NDc0OTc2NTE0MTEx.GpiPgR.WMlXqHD_0ZKiGq9ULWxJDhZcJrY7SIQj14L7ww");
+// Error handling
+process.on('unhandledRejection', error => {
+    console.error('Unhandled promise rejection:', error);
+});
+
+client.login(process.env.TOKEN);
